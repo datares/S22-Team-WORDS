@@ -7,7 +7,7 @@ output: html_document
 
 ## Data Frame transformation
 
-```{r cars}
+```{r}
 words <- read.csv("valid_solutions.csv")
 not_valid_words <- read.csv("valid_guesses.csv")
 
