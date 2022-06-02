@@ -1,0 +1,244 @@
+---
+title: "Wordle"
+author: "Kevin Hamakawa"
+date: "3/30/2022"
+output: html_document
+---
+
+## Data Frame transformation
+
+```{r cars}
+words <- read.csv("valid_solutions.csv")
+not_valid_words <- read.csv("valid_guesses.csv")
+
+all_words <- c(words_vector, not_valid_words_vector)
+
+head(words)
+
+words_vector <- words[[1]]
+head(words_vector)
+not_valid_words_vector <- not_valid_words[[1]]
+
+head(words_vector)
+
+words_unlisted <- unlist(strsplit(words_vector, split = ""))
+head(words_unlisted)
+words_matrix <- matrix(words_unlisted, ncol = 5, byrow = TRUE)
+head(words_matrix)
+df_words <- data.frame(words_matrix)
+words_matrix
+write.csv(df_words, "letters.csv")
+empty <- numeric(26)
+
+barplot(sort(table(words_unlisted)), cex.names = 0.8, main = "Most Common Wordle Letters", col = "darkolivegreen3")
+
+```
+
+## Function to Compare Guess and Wordle
+
+```{r}
+compare <- function(guess, wordle) {
+  guess <- unlist(strsplit(guess, split = ""))
+  wordle <- unlist(strsplit(wordle, split = ""))
+  orig_guess <- guess
+  orig_wordle <- wordle
+  
+  matches <- logical(0)
+  for (i in 1:5) {
+    if (guess[i] == wordle[i]) {
+      matches <- c(matches, i)
+    }
+  }
+  matches_output <- matches
+  names(matches_output) = guess[matches]
+  
+  incorrect_indexes <- logical(0)
+  similar <- logical(0)
+  for (i in seq_len(length(guess))) {
+    for (j in seq_len(length(guess))) {
+      if (guess[i] == wordle[j]) {
+        incorrect_indexes <- c(incorrect_indexes, i)
+        similar <- c(similar, guess[i])
+        wordle[j] = "1"
+        break
+      }
+    }
+  }
+  names(incorrect_indexes) = similar
+  
+  remove_indexes = c(matches_output, incorrect_indexes)
+  
+  if (length(remove_indexes != 0)) {
+     guess <- orig_guess[-remove_indexes]
+  }
+  
+  remove_these <- logical(0)
+  for (i in seq_len(length(matches_output))) {
+    for (j in seq_len(length(incorrect_indexes))) {
+      if (matches_output[i] == incorrect_indexes[j] && attributes(matches_output)$names[i] == attributes(incorrect_indexes)$names[j]) {
+        remove_these <- c(remove_these, j)
+      }
+    }
+  }
+  
+  if (length(remove_these) != 0) {
+    incorrect_indexes <- incorrect_indexes[-remove_these]
+  }
+  
+  list("matches" = matches_output, "similar" = incorrect_indexes, "incorrect" = guess)
+  
+}
+```
+
+## Compare Every 5 Letter Word with every Valid Wordle Word
+
+```{r}
+check_words <- function(input) {
+  results_matrix <- matrix(NA, nrow = length(words_vector), ncol = 2)
+  for (i in seq_len(length(words_vector))) {
+    results_matrix[i,] <- c(length(compare(input, words_vector[i])$matches),length(compare(input, words_vector[i])$similar))
+  }
+  means <- c(mean(results_matrix[,1]), mean(results_matrix[,2]))
+  list("numbers" = means, "word" = input)
+}
+
+answers <- data.frame("Word" = NA, "Matches" = NA, "Similar" = NA)
+
+for(i in seq_len(length(all_words))) {
+  checked <- check_words(all_words[i])
+  answers[i,1] <- checked$word
+  answers[i,2] <- checked$numbers[1]
+  answers[i,3] <- checked$numbers[2]
+} 
+
+write.csv(answers, "answers.csv")
+
+answers <- read.csv("answers.csv")
+
+```
+
+
+### Data Frame with Algorithm for First Best Word
+```{r}
+
+answers$TotalScore <- ((as.numeric(answers$Matches) * 1.5) + (as.numeric(answers$Similar) * 1)) / 2.1
+answers <- answers[rev(order(answers$TotalScore)),]
+
+answers <- answers[2:5]
+
+rownames(answers) <- NULL
+
+answers
+
+top_10_graph <- ggplot(top_10, aes(x = factor(top_10$Word, levels = top_10$Word), y =  TotalScore)) + geom_bar(stat = "identity", color = "black", fill = "darkolivegreen3") + ylab("Total Ranking Score") + xlab("Word") + ggtitle("10 Best Wordle Starters by Score")
+
+ggsave("top10.png", top_10_graph, width = 8,height = 5)
+
+```
+
+### Finding Second Best Word
+```{r}
+compare_to_soare <- function(word) {
+  similar = TRUE
+  letters = unlist(strsplit(word, split = ""))
+  soare_letters <- unlist(strsplit("soare", split = ""))
+  for (i in seq_len(5)) {
+    if (letters[i] %in% soare_letters) {
+      similar = FALSE
+    }
+  }
+  similar
+}
+
+compare_to_roate <- function(word) {
+  similar = TRUE
+  letters = unlist(strsplit(word, split = ""))
+  soare_letters <- unlist(strsplit("saree", split = ""))
+  for (i in seq_len(5)) {
+    if (letters[i] %in% soare_letters) {
+      similar = FALSE
+    }
+  }
+  similar
+}
+
+no_soare_answers <- answers[which(vapply(answers$Word, compare_to_soare, logical(1))),]
+no_soare_answers_ordered <- no_soare_answers[rev(order(no_soare_answers$TotalScore)),]
+best_second_word <- no_soare_answers_ordered[1:10,]
+
+top_10_graph_second <- ggplot(best_second_word, aes(x = factor(best_second_word$Word, levels = best_second_word$Word), y =  TotalScore)) + geom_bar(stat = "identity", color = "black", fill = "darkolivegreen3") + ylab("Total Ranking Score") + xlab("Word") + ggtitle("10 Best Wordle Words After 'Soare'")
+
+top_10_graph_second
+
+ggsave("top10_second.png", top_10_graph_second, width = 8,height = 5)
+
+```
+
+
+```{r}
+library(ggplot2)
+
+best_15_combined <- answers[rev(order(answers$Total)),][1:15,]
+best_15_combined
+
+most_average_squares <- ggplot(best_15_combined, aes(y = factor(best_15_combined$Word, levels = best_15_combined$Word), x = as.numeric(best_15_combined$Total))) + geom_bar(stat = "identity", color = "black", fill = "gold2") + xlim(0,2) + xlab("Average Squares (Matches + Similar Letters)") + geom_bar(data = best_15_combined, aes(y = factor(best_15_combined$Word, levels = best_15_combined$Word), x = as.numeric(best_15_combined$Matches)), stat = "identity", color = "black", fill = "darkolivegreen3") + ggtitle("Top 15 Most Average Squares") + ylab("Word")
+
+most_average_squares
+
+ggsave("mostaveragesquares.png", most_average_squares, width = 8, height = 5)
+
+```
+
+
+### Heatmap of Letter Positions
+```{r}
+library(dplyr)
+library(ggplot2)
+library(reshape)
+
+letters <- c("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z")
+frequencies <- matrix(NA, nrow = 26, ncol = 5)
+for (i in seq_along(letters)) {
+  frequencies[i,] = c(sum(df_words[,1] == letters[i]),
+sum(df_words[,2] == letters[i]),
+sum(df_words[,3] == letters[i]),
+sum(df_words[,4] == letters[i]),
+sum(df_words[,5] == letters[i]))
+}
+
+for (i in seq_len(26)) {
+  frequencies[i,] <- frequencies[i,] / sum(frequencies[i,])
+}
+
+df_frequencies <- data.frame("Letters" = letters)
+df_frequencies$'1' <- frequencies[,1]
+df_frequencies$'2' <- frequencies[,2]
+df_frequencies$'3' <- frequencies[,3]
+df_frequencies$'4' <- frequencies[,4]
+df_frequencies$'5' <- frequencies[,5]
+df_frequencies1 <- melt(df_frequencies)
+
+plot <- ggplot(df_frequencies1, aes(variable, Letters, fill= value)) + 
+ geom_tile() + xlab("Position") + ggtitle("Proportion of Frequencies of Each Letter by Position") + scale_fill_distiller(direction = 1, palette = 'Greens')
+plot
+
+ggsave("heatmap.png", plot, height = 8, width = 7)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
