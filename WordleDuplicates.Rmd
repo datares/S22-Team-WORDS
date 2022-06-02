@@ -1,0 +1,1114 @@
+---
+title: "Wordle Duplicates"
+author: "Olivia Weisiger"
+date: '`r format(Sys.Date(), '%D')`'
+output: html_document
+---
+
+### Valid Guesses
+
+Words that are valid guesses, but will not be the final solution. Good guesses 
+can give information about what letters appear in a word, and in what position.
+
+```{r}
+guesses <- read.csv("/Users/oliviaweisiger/Desktop/DataRes/valid_guesses.csv")
+```
+
+### Valid Solutions
+
+A list of potential solutions to the Wordle puzzle. 
+
+```{r}
+solutions <- read.csv("/Users/oliviaweisiger/Desktop/DataRes/valid_solutions.csv")
+```
+
+### Finding Duplicate Proportions
+
+Let the duplicate proportion for each specific letter be:
+
+P(duplicate) = (# words with duplicates of letter) / (total # words with letter)
+
+```{r}
+proportions_df <- data.frame(matrix(ncol = 2, nrow = length(letters)))
+#provide column names
+colnames(proportions_df) <- c('letter', 'proportion')
+proportions_df[, 1] <- letters
+  
+words_vector <- solutions[, 1] 
+
+### checks if word is duplicate
+check_duplicate <- function(word) {
+  word <- unlist(strsplit(word, split = ""))
+  check = FALSE
+  for (i in seq_len(5)) {
+    if (any(word[i] == word[-i])) {
+      check = TRUE
+    }
+  }
+  check
+}
+
+########## a ###################################################################
+### checks if word has specific letter
+check_a <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("a" %in% word) {
+    check = TRUE
+  }
+  check
+}
+### finds a words
+a_words <- words_vector[vapply(words_vector, check_a, logical(1))]
+
+a_words_not_correct <- a_words[vapply(a_words, check_duplicate, logical(1))]
+### checks if it has duplicate of specific letter
+check_a_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "a") > 1) {
+    check = TRUE
+  }
+  check
+}
+### function that checks if word is duplicate and has specific letter
+check_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_a_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+### finds proportion
+a_prop <- length(a_words[vapply(a_words, check_both, logical(1))]) / length(a_words)
+### adds proportion to df
+proportions_df[1 , 2] <- a_prop
+
+############ b #################################################################
+
+### checks if word has specific letter
+check_b <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("b" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+b_words <- words_vector[vapply(words_vector, check_b, logical(1))]
+
+b_words_not_correct <- b_words[vapply(b_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_b_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "b") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_b_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_b_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+b_prop <- length(b_words[vapply(b_words, check_b_both, logical(1))]) / length(b_words)
+
+### adds proportion to df
+proportions_df[2 , 2] <- b_prop
+
+############ c #################################################################
+
+### checks if word has specific letter
+check_c <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("c" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+c_words <- words_vector[vapply(words_vector, check_c, logical(1))]
+
+c_words_not_correct <- c_words[vapply(c_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_c_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "c") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_c_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_c_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+c_prop <- length(c_words[vapply(c_words, check_c_both, logical(1))]) / length(c_words)
+
+### adds proportion to df
+proportions_df[3 , 2] <- c_prop
+
+############ d #################################################################
+
+### checks if word has specific letter
+check_d <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("d" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+d_words <- words_vector[vapply(words_vector, check_d, logical(1))]
+
+d_words_not_correct <- d_words[vapply(d_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_d_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "d") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_d_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_d_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+d_prop <- length(d_words[vapply(d_words, check_d_both, logical(1))]) / length(d_words)
+
+### adds proportion to df
+proportions_df[4 , 2] <- d_prop
+
+############ e #################################################################
+
+### checks if word has specific letter
+check_e <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("e" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+e_words <- words_vector[vapply(words_vector, check_e, logical(1))]
+
+e_words_not_correct <- e_words[vapply(e_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_e_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "e") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_e_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_e_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+e_prop <- length(e_words[vapply(e_words, check_e_both, logical(1))]) / length(e_words)
+
+### adds proportion to df
+proportions_df[5 , 2] <- e_prop
+
+############ f #################################################################
+
+### checks if word has specific letter
+check_f <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("f" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+f_words <- words_vector[vapply(words_vector, check_f, logical(1))]
+
+f_words_not_correct <- f_words[vapply(f_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_f_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "f") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_f_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_f_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+f_prop <- length(f_words[vapply(f_words, check_f_both, logical(1))]) / length(f_words)
+
+### adds proportion to df
+proportions_df[6 , 2] <- f_prop
+
+############ g #################################################################
+
+### checks if word has specific letter
+check_g <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("g" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+g_words <- words_vector[vapply(words_vector, check_g, logical(1))]
+
+g_words_not_correct <- g_words[vapply(g_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_g_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "g") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_g_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_g_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+g_prop <- length(g_words[vapply(g_words, check_g_both, logical(1))]) / length(g_words)
+
+### adds proportion to df
+proportions_df[7 , 2] <- g_prop
+
+############ h #################################################################
+
+### checks if word has specific letter
+check_h <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("h" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+h_words <- words_vector[vapply(words_vector, check_h, logical(1))]
+
+h_words_not_correct <- h_words[vapply(h_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_h_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "h") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_h_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_h_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+h_prop <- length(h_words[vapply(h_words, check_h_both, logical(1))]) / length(h_words)
+
+### adds proportion to df
+proportions_df[8 , 2] <- h_prop
+
+############ i #################################################################
+
+### checks if word has specific letter
+check_i <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("i" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+i_words <- words_vector[vapply(words_vector, check_i, logical(1))]
+
+i_words_not_correct <- i_words[vapply(i_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_i_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "i") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_i_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_i_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+i_prop <- length(i_words[vapply(i_words, check_i_both, logical(1))]) / length(i_words)
+
+### adds proportion to df
+proportions_df[9 , 2] <- i_prop
+
+############ j #################################################################
+
+### checks if word has specific letter
+check_j <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("j" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+j_words <- words_vector[vapply(words_vector, check_j, logical(1))]
+
+j_words_not_correct <- j_words[vapply(j_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_j_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "j") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_j_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_j_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+j_prop <- length(j_words[vapply(j_words, check_j_both, logical(1))]) / length(j_words)
+
+### adds proportion to df
+proportions_df[10 , 2] <- j_prop
+
+############ k #################################################################
+
+### checks if word has specific letter
+check_k <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("k" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+k_words <- words_vector[vapply(words_vector, check_k, logical(1))]
+
+k_words_not_correct <- k_words[vapply(k_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_k_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "k") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_k_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_k_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+k_prop <- length(k_words[vapply(k_words, check_k_both, logical(1))]) / length(k_words)
+
+### adds proportion to df
+proportions_df[11 , 2] <- k_prop
+
+############ l #################################################################
+
+### checks if word has specific letter
+check_l <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("l" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+l_words <- words_vector[vapply(words_vector, check_l, logical(1))]
+
+l_words_not_correct <- l_words[vapply(l_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_l_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "l") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_l_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_l_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+l_prop <- length(l_words[vapply(l_words, check_l_both, logical(1))]) / length(l_words)
+
+### adds proportion to df
+proportions_df[12 , 2] <- l_prop
+
+############ m #################################################################
+
+### checks if word has specific letter
+check_m <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("m" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+m_words <- words_vector[vapply(words_vector, check_m, logical(1))]
+
+m_words_not_correct <- m_words[vapply(m_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_m_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "m") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_m_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_m_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+m_prop <- length(m_words[vapply(m_words, check_m_both, logical(1))]) / length(m_words)
+
+### adds proportion to df
+proportions_df[13 , 2] <- m_prop
+
+############ n #################################################################
+
+### checks if word has specific letter
+check_n <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("n" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+n_words <- words_vector[vapply(words_vector, check_n, logical(1))]
+
+n_words_not_correct <- n_words[vapply(n_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_n_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "n") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_n_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_n_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+n_prop <- length(n_words[vapply(n_words, check_n_both, logical(1))]) / length(n_words)
+
+### adds proportion to df
+proportions_df[14 , 2] <- n_prop
+
+############ o #################################################################
+
+### checks if word has specific letter
+check_o <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("o" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+o_words <- words_vector[vapply(words_vector, check_o, logical(1))]
+
+o_words_not_correct <- o_words[vapply(o_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_o_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "o") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_o_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_o_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+o_prop <- length(o_words[vapply(o_words, check_o_both, logical(1))]) / length(o_words)
+
+### adds proportion to df
+proportions_df[15 , 2] <- o_prop
+
+############ p #################################################################
+
+### checks if word has specific letter
+check_p <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("p" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+p_words <- words_vector[vapply(words_vector, check_p, logical(1))]
+
+p_words_not_correct <- p_words[vapply(p_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_p_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "p") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_p_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_p_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+p_prop <- length(p_words[vapply(p_words, check_p_both, logical(1))]) / length(p_words)
+
+### adds proportion to df
+proportions_df[16 , 2] <- p_prop
+
+############ q #################################################################
+
+### checks if word has specific letter
+check_q <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("q" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+q_words <- words_vector[vapply(words_vector, check_q, logical(1))]
+
+q_words_not_correct <- q_words[vapply(q_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_q_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "q") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_q_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_q_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+q_prop <- length(q_words[vapply(q_words, check_q_both, logical(1))]) / length(q_words)
+
+### adds proportion to df
+proportions_df[17 , 2] <- q_prop
+
+############ r #################################################################
+
+### checks if word has specific letter
+check_r <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("r" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+r_words <- words_vector[vapply(words_vector, check_r, logical(1))]
+
+r_words_not_correct <- r_words[vapply(r_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_r_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "r") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_r_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_r_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+r_prop <- length(r_words[vapply(r_words, check_r_both, logical(1))]) / length(r_words)
+
+### adds proportion to df
+proportions_df[18 , 2] <- r_prop
+
+############ s #################################################################
+
+### checks if word has specific letter
+check_s <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("s" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+s_words <- words_vector[vapply(words_vector, check_s, logical(1))]
+
+s_words_not_correct <- s_words[vapply(s_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_s_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "s") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_s_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_s_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+s_prop <- length(s_words[vapply(s_words, check_s_both, logical(1))]) / length(s_words)
+
+### adds proportion to df
+proportions_df[19 , 2] <- s_prop
+
+############ t #################################################################
+
+### checks if word has specific letter
+check_t <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("t" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+t_words <- words_vector[vapply(words_vector, check_t, logical(1))]
+
+t_words_not_correct <- t_words[vapply(t_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_t_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "t") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_t_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_t_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+t_prop <- length(t_words[vapply(t_words, check_t_both, logical(1))]) / length(t_words)
+
+### adds proportion to df
+proportions_df[20 , 2] <- t_prop
+
+############ u #################################################################
+
+### checks if word has specific letter
+check_u <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("u" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+u_words <- words_vector[vapply(words_vector, check_u, logical(1))]
+
+u_words_not_correct <- u_words[vapply(u_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_u_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "u") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_u_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_u_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+u_prop <- length(u_words[vapply(u_words, check_u_both, logical(1))]) / length(u_words)
+
+### adds proportion to df
+proportions_df[21 , 2] <- u_prop
+
+############ v #################################################################
+
+### checks if word has specific letter
+check_v <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("v" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+v_words <- words_vector[vapply(words_vector, check_v, logical(1))]
+
+v_words_not_correct <- v_words[vapply(v_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_v_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "v") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_v_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_v_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+v_prop <- length(v_words[vapply(v_words, check_v_both, logical(1))]) / length(v_words)
+
+### adds proportion to df
+proportions_df[22 , 2] <- v_prop
+
+############ w #################################################################
+
+### checks if word has specific letter
+check_w <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("w" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+w_words <- words_vector[vapply(words_vector, check_w, logical(1))]
+
+w_words_not_correct <- w_words[vapply(w_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_w_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "w") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_w_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_w_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+w_prop <- length(w_words[vapply(w_words, check_w_both, logical(1))]) / length(w_words)
+
+### adds proportion to df
+proportions_df[23 , 2] <- w_prop
+
+############ x #################################################################
+
+### checks if word has specific letter
+check_x <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("x" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+x_words <- words_vector[vapply(words_vector, check_x, logical(1))]
+
+x_words_not_correct <- x_words[vapply(x_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_x_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "x") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_x_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_x_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+x_prop <- length(x_words[vapply(x_words, check_x_both, logical(1))]) / length(x_words)
+
+### adds proportion to df
+proportions_df[24 , 2] <- x_prop
+
+############ y #################################################################
+
+### checks if word has specific letter
+check_y <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("y" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+y_words <- words_vector[vapply(words_vector, check_y, logical(1))]
+
+y_words_not_correct <- y_words[vapply(y_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_y_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "y") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_y_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_y_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+y_prop <- length(y_words[vapply(y_words, check_y_both, logical(1))]) / length(y_words)
+
+### adds proportion to df
+proportions_df[25 , 2] <- y_prop
+
+############ z #################################################################
+
+### checks if word has specific letter
+check_z <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if ("z" %in% word) {
+    check = TRUE
+  }
+  check
+}
+
+z_words <- words_vector[vapply(words_vector, check_z, logical(1))]
+
+z_words_not_correct <- z_words[vapply(z_words, check_duplicate, logical(1))]
+
+### checks if it has duplicate of specific letter
+check_z_duplicate <- function(word) {
+  check = FALSE
+  word <- unlist(strsplit(word, split = ""))
+  if (sum(word == "z") > 1) {
+    check = TRUE
+  }
+  check
+}
+
+### function that checks if word is duplicate and has specific letter
+check_z_both <- function(word) {
+  check = FALSE
+  if (check_duplicate(word) && check_z_duplicate(word)) {
+    check = TRUE
+  }
+  check
+}
+
+### finds proportion
+z_prop <- length(z_words[vapply(z_words, check_z_both, logical(1))]) / length(z_words)
+
+### adds proportion to df
+proportions_df[26 , 2] <- z_prop
+
+# Final props df
+proportions_df
+```
